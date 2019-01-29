@@ -1,28 +1,54 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import {connect} from 'react-redux';
+import { addTodo, toggleTodo } from './actions/';
+import TodoList from './components/TodoList';
 import './App.css';
-//initial commit
+
+
+
 class App extends Component {
+ state = {
+      newTodo: ''
+    };
+  
+
+  addTodo = (e)=> {
+    e.preventDefault();
+    this.props.addTodo(this.state.newTodo);
+    this.setState({newTodo: ''});
+  }
+
+  handleChange = (e)=> {
+    this.setState({[e.target.name]: e.target.value});
+  }
+
   render() {
+    console.log(this.props);
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <form onSubmit={this.addTodo}>
+          <input
+            onChange={this.handleChange}
+            value={this.state.newTodo}
+            placeholder='Add a Todo'
+            name="newTodo"
+          />
+        </form>
+       {this.props.todos.map(todo => {
+         return(<div onClick={() => this.props.toggleTodo(todo.id)}>
+         <TodoList   key={todo.id} todo={todo} />
+         </div>)
+ 
+       })}
       </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = (state)=> {
+  return {
+    todos: state.todos
+  };
+};
+
+export default connect(mapStateToProps, {addTodo, toggleTodo})(App);
